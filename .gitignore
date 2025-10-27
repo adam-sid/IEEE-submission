@@ -1,0 +1,3 @@
+.latexmkrc
+build/
+.DS_Store
