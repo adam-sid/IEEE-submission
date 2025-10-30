@@ -163,12 +163,19 @@ All components were commercially available, and assembling the final hardware
 required only basic tools. Each device used the iLabs Challenger RP2040
 microcontroller, which provided the necessary computing power and included
 built-in LoRa capability for wireless communication. The gateway node was
-additionally equipped with a Raspberry Pi to enable WIFI connectivity and
-remote access via VNC Viewer.
+additionally equipped with a Raspberry Pi to enable WIFI connectivity and remote
+access via VNC Viewer.
 
 \subsection{Webapp design}
 
-Weather data was sent to a purpose built webapp 
+Weather data was sent from the gateway to a purpose built webapp called
+Agriscanner. This webapp allowed for the displaying of current, historic and
+future (predicted) weather.
+
+The dashboard (Figure \ref{dashboard}) displayed live weather data from the
+nodes with a 1 minute update frequency. Clicking on a particular data point
+allows the user to see a graph of past and future weather data in a way that is
+familiar to any user of standard forecasting apps (Figure \ref{temperature}).
 
 \begin{figure}[htbp]
 \centerline{\includegraphics[width=0.5\textwidth]{figures/main-page.jpg}}
@@ -179,10 +186,76 @@ Weather data was sent to a purpose built webapp
 \begin{figure}[htbp]
 \centerline{\includegraphics[width=0.5\textwidth]{figures/temperature-node-one.jpg}}
 \caption{Webapp temperature page showing current and predicted weather}
-\label{Temperature}
+\label{temperature}
 \end{figure}
 
 \subsection{Training and deployment of Machine learning algorithm}
+
+To forecast microclimate date up to 48 hours in advance, we trained 10 separate
+machine learning models using the LightGBM algorithm. One model was created for
+each of the five sensor variables (temperature, humidity, wind speed, gust speed
+and soil moisture) for each of the two nodes. LightGBM was selected for its high
+performance on tabular climate data as the authors in
+\cite{abdelmadjid2025enhancing} show. An additional benefit of this set up is
+that LightGBM is compatible with the m2cgen library which allows the conversion
+of the final models to individual JavaScript files.
+
+\begin{figure}[htbp]
+\centerline{\includegraphics[width=0.5\textwidth]{figures/machine-learning-diagram2.jpg}}
+\caption{Infographic showing training steps for training with LightGBM}
+\label{machine-learning}
+\end{figure}
+
+The following steps were followed to train each of the ten models, this is also
+shown visually in Figure \ref{machine-learning}
+
+\begin{enumerate}
+    \item \textbf{Dataset prepared:} A single cleaned dataset was created by
+          matching timestamps between the api weather data and the sensor node
+          data. As API readings are taken every 10 minutes and node readings
+          every 1 minute, this meant that 9/10 node readings were discarded. The
+          final dataset was roughly 1,400 rows. The data used for training
+          spanned the period 15 - 27 August as that final date was when I
+          trained the model.
+    \item \textbf{Feature set and target data defined:} The feature set from the
+          weather API and targets from the node data were defined, and
+          unnecessary columns discarded. The database timestamp field was
+          transformed into sine and cosine representations of day and year. This
+          is necessary when training on a time-series data set as the algorithm
+          must be able to understand the cyclical nature of time. For example,
+          using raw timestamps would incorrectly suggest to the algorithm that
+          the times of 23:00 on day 1 and 00:00 on day 2 are 23 hours apart
+          rather than just 1 hour.
+    \item \textbf{Dataset split into training data (80\%) and validation data
+          (20\%):} The data is split by time so the training data consists of
+          the first 80\% of the rows and the validation data the last 20\%. This
+          data is then supplied to the model.
+    \item \textbf{Iterative training:} For each iteration, the model looks at
+          the inputs (training features) and the correct answers (training
+          target) of the training rows, and determines where it is getting
+          incorrect outputs. It builds a small decision tree that specifically
+          aims to correct those mistakes on the training rows and adds that tree
+          into itself so its predictions change a little. It then applies the
+          updated model to the validation inputs (validation features) and
+          compares those predictions to the validation answers (validation
+          target) —to see how well the model would do on new "unseen" data. The
+          validation data are never used to build the tree; they are only used
+          to check the accuracy of the model. If the validation check shows no
+          improvement after a number of iterations, the training stops and the
+          model keeps the version that performed best on validation.  The
+          process will perform a minimum of 50 iterations. I set the maximum
+          number of iterations to 250 to prevent the models getting too large,
+          as each iteration increases the model size substantially (The humidity
+          model is over 40,000 lines long in JavaScript format for example).
+\end{enumerate}
+
+Once the ten models had been trained, they were uploaded to the web server. I
+wrote an automated function on my backend that provides the models with
+datapoints from the OpenWeather forecast data for the next 48 hours, and updates
+this data every ten minutes to adjust the predictions as the forecast changes.
+The outputs from the models are recorded as hourly predictions for each
+datapoint in a JSON file, which is requested by the frontend software and used
+to display a line graph of predicted values for the next 48 hours.
 
 \section{Results}\label{RES}
 
