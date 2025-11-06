@@ -9,14 +9,19 @@
 \usepackage{graphicx}
 \usepackage{textcomp}
 \usepackage{xcolor}
+\usepackage[hyphens]{url}
+\usepackage[hidelinks]{hyperref}
+\usepackage{breakurl}
 \bibliographystyle{IEEEtran}
 \def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
     T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
 \begin{document}
 
+%TC:ignore
+
 \title{Forecasting microclimates with a low-cost LoRa enabled weather station
 network\\
-\thanks{Identify applicable funding agency here. If none, delete this.}
+\thanks{This project is funded by the UK Research Institute}
 }
 
 \author{\IEEEauthorblockN{1\textsuperscript{st} Adam Sidnell}
@@ -34,19 +39,92 @@ r.chitchyan@bristol.ac.uk} }
 \maketitle
 
 \begin{abstract}
-Farmers require accurate weather forecasting for a variety of reasons. Such as
-deciding if wind speed will be low enough to spray crops or whether there is a
-risk of spring frost and they should take appropriate action. This paper
-develops a low-cost weather station network built from widely available
-electronics for deployment in an agricultural setting. It then uses data from
-the network to train a LightGBM 
+General weather forecasts are often too broad to accurately capture the small
+climatic variation that exists on farms. This can lead to sub-optimal decisions
+on tasks such as crop spraying, frost prevention or irrigation. While commercial
+weather stations exist, there is often a trade-off between their cost and
+transmission range. Additionally, these hardware products do not attempt to use
+their data to offer farmers improved forecasting on their fields. This paper
+presents the prototype design and evaluation for Agriscanner: An end-to-end,
+low-cost IoT weather station network that incorporates machine learning
+(LightGBM) to predict future weather within a field. Data is streamed to a web
+application for live visualisation. Evaluation shows the hardware system
+achieves a 1,200m range between nodes for a total range of 2,400m in non-ideal
+conditions. This was achieved at a cost of £520 for the complete system which
+includes two sensor nodes, a repeater and a WiFi gateway while outperforming
+commercial alternatives in range and cost. The machine learning model showed
+mixed results, outperforming general forecasts for certain climate factors
+(wind-speed) but highlighting the need for a larger, more diverse training
+dataset.
 \end{abstract}
 
 \begin{IEEEkeywords}
 machine learning, smart farming, forecast, microclimate, IoT, LoRa, LightGBM
 \end{IEEEkeywords}
 
+%TC:endignore
+
 \section{Introduction}\label{INTRO} 
+
+Accurate weather data is critical for decision making in agriculture. Farmers
+rely on forecasts for various daily farming functions with significant financial
+and environmental costs attached. For example, it is required by law that
+pesticide spraying must be done in low wind speed to prevent spray drift which
+can damage nearby ecosystems \cite{defra2006code}. Similarly, spring frosts pose
+a significant risk to crop yields; a single frost night can reduce crop yields
+by as much as 24\% \cite{drepper2022springfrost}, highlighting the need for an
+accurate prediction allowing farmers to take appropriate counter measures (in
+the case of frosts this could be installing high power fans over the field).
+
+However, general weather forecasts, as provided by the MetOffice in the UK, are
+based on macro-scale models which are not designed to capture local climate
+variations, known as microclimates. Farmers rank the accuracy and reliability of
+weather forecasts as one of the largest limiting factors when making decisions
+in growing season \cite{hu2006understanding}.
+
+To address this issue, this paper presents a complete end-to-end system called
+Agriscanner. While commercial IoT weather stations exist, simply viewing current
+and historical data is insufficient for effective planning. The primary
+contribution of this work is a deployable system that applies an open-source
+machine learning procedure using locally collected sensor data to forecast the
+microclimate.
+
+This approach is distinct from related work in three key areas. First, unlike
+studies relying on public datasets or existing sensor networks, we designed and
+built the entire low-cost hardware network required to collect data from remote
+fields. Second, while other systems focus on complex deep learning models, we
+demonstrate the application of an efficient, tree-based machine learning model
+(LightGBM) as a more accessible alternative. Third, this model is applied in a
+challenging open air environment, as opposed to more controlled contexts such as
+greenhouses.
+
+\subsection{LoRa}
+
+To ensure the hardware system was appropriate for the off-grid context of most
+agricultural applications, the communication technology chosen for the devices
+was highly important.
+
+LoRa (Long Range) is a radio modulation technique invented in 2014 that allows
+for the transmission of data over very long distances. The technology is notable
+for achieving this long-range transmission (over 4000 times greater than WiFi
+\cite{spiess2019}) while using remarkably little power. This makes it the
+preferred technology for the remote, off-grid application in this project.
+
+The most important principle that separates LoRa from traditional radio
+modulation is its ability to demodulate incoming signals more efficiently. This
+allows the receiver to distinguish signals that are below the noise floor - that
+is, even when background noise is "louder" than the LoRa signal, the data can
+still be processed.
+
+This efficiency gives LoRa a far greater effective range despite their low power
+output. Relatedly, it also reduces the power budget for both the transmitter
+(sending weaker signals) and the receiver (easier demodulation), which is ideal
+for battery-powered devices. For a technical understanding of the technical
+aspects of LoRa refer to \cite{vangelista2017}.
+
+The main disadvantage of LoRa is a comparatively low data throughput - around 5
+kbps in the configuration used here. However, since the data packets in this
+project were very small this was not a major issue.
 
 \section{Related Work}\label{REL}
 
@@ -55,9 +133,8 @@ machine learning, smart farming, forecast, microclimate, IoT, LoRa, LightGBM
 IoT devices have seen widespread adoption in agriculture, with digital solutions
 offering the potential to improve yields even in remote areas. LoRa is an
 especially relevant technology in this context as the range of these devices
-enables data to be transmitted over long distances; additionally the low power
-of these devices allows for the use of gridless power solutions - such as
-solar-battery as used here. 
+enables data to be transmitted over long distances and the low power allows for
+the use of gridless power solutions - such as solar-battery as used here. 
 
 There are relatively few papers examining the effectiveness of LoRa in
 agriculture but some notable examples include \cite{edgeAiGiaEtAl} where LoRa
@@ -122,11 +199,11 @@ data.
 A recent paper from Abdelmadjid et al 2025 \cite{abdelmadjid2025enhancing} used
 online datasets from Kaggle (a public repository of various datasets) to develop
 an ML tool to predict changes in temperature and humidity within greenhouses in
-response to changes to external weather conditions.  They used this data to test
-three ML models and three DL models and selected the LightGBM ML model and the
-LSTM DL model as the best performing models for prediction. The overall system
-design consisted of four LSTM models feeding into the LightGBM model. This
-design resulted in 98.45\% accuracy for temperature predictions and 99.61\%
+response to changes to external weather conditions.  They used these data to
+test three ML models and three DL models and selected the LightGBM ML model and
+the LSTM DL model as the best performing models for prediction. The overall
+system design consisted of four LSTM models feeding into the LightGBM model.
+This design resulted in 98.45\% accuracy for temperature predictions and 99.61\%
 accuracy for humidity predictions. Due to these results LightGBM was also chosen
 for this experiment.
 
@@ -160,11 +237,28 @@ gateway. The purpose for each is outlined below:
 \end{figure}
 
 All components were commercially available, and assembling the final hardware
-required only basic tools. Each device used the iLabs Challenger RP2040
-microcontroller, which provided the necessary computing power and included
-built-in LoRa capability for wireless communication. The gateway node was
-additionally equipped with a Raspberry Pi to enable WIFI connectivity and remote
-access via VNC Viewer.
+required only basic tools. Each device used an RP2040 based microcontroller
+(iLabs Challenger LoRa) microcontroller, which provided the necessary computing
+power and included built-in LoRa capability for wireless communication. The
+gateway node was additionally equipped with a Raspberry Pi to enable WIFI
+connectivity and remote access via VNC Viewer.
+
+\subsubsection{Weatherproofing}
+All sensitive electronics were housed in an IP65-rated waterproof junction box.
+Most external components were water resistant by design with the exception of
+the soil moisture sensor: In this case the electronics were coated in
+non-conductive nail varnish and sealed with heatshrink. All cable entry points
+to the main box were sealed with silicone to prevent water ingress.
+
+\subsection{Deployment}
+
+The nodes were completed by mid-august and were installed in a private garden
+for a test deployment collecting local readings from two different locations in
+the garden. This helped facilitate easy repairs and updates to the devices.
+
+The system ran continuously in this location from the 15th of August, 2025,
+which provided the data used for the machine learning model's training and
+evaluation later that month.
 
 \subsection{Webapp design}
 
@@ -200,14 +294,19 @@ performance on tabular climate data as the authors in
 that LightGBM is compatible with the m2cgen library which allows the conversion
 of the final models to individual JavaScript files.
 
+The model was trained using both historical sensor readings collected in the
+field and general forecast data taken from OpenWeather's API. The final models
+were then able to take future general weather forecast data as input and bias
+correct with the aim of improving accuracy.
+
 \begin{figure}[htbp]
 \centerline{\includegraphics[width=0.5\textwidth]{figures/machine-learning-diagram2.jpg}}
 \caption{Infographic showing training steps for training with LightGBM}
 \label{machine-learning}
 \end{figure}
 
-The following steps were followed to train each of the ten models, this is also
-shown visually in Figure \ref{machine-learning}
+The following steps were followed to train each of the ten models, also shown
+visually in Figure \ref{machine-learning}
 
 \begin{enumerate}
     \item \textbf{Dataset prepared:} A single cleaned dataset was created by
@@ -215,8 +314,7 @@ shown visually in Figure \ref{machine-learning}
           data. As API readings are taken every 10 minutes and node readings
           every 1 minute, this meant that 9/10 node readings were discarded. The
           final dataset was roughly 1,400 rows. The data used for training
-          spanned the period 15 - 27 August as that final date was when I
-          trained the model.
+          spanned the period 15 - 27 August.
     \item \textbf{Feature set and target data defined:} The feature set from the
           weather API and targets from the node data were defined, and
           unnecessary columns discarded. The database timestamp field was
@@ -224,12 +322,12 @@ shown visually in Figure \ref{machine-learning}
           is necessary when training on a time-series data set as the algorithm
           must be able to understand the cyclical nature of time. For example,
           using raw timestamps would incorrectly suggest to the algorithm that
-          the times of 23:00 on day 1 and 00:00 on day 2 are 23 hours apart
-          rather than just 1 hour.
+          the times of 23:00 on day 1 and 00:00 on day 2 are not closely
+          related.
     \item \textbf{Dataset split into training data (80\%) and validation data
-          (20\%):} The data is split by time so the training data consists of
-          the first 80\% of the rows and the validation data the last 20\%. This
-          data is then supplied to the model.
+          (20\%):} The data are split by time so the training data consists of
+          the first 80\% of the rows and the validation data the last 20\%.
+          These data are then supplied to the model.
     \item \textbf{Iterative training:} For each iteration, the model looks at
           the inputs (training features) and the correct answers (training
           target) of the training rows, and determines where it is getting
@@ -249,21 +347,61 @@ shown visually in Figure \ref{machine-learning}
           model is over 40,000 lines long in JavaScript format for example).
 \end{enumerate}
 
-Once the ten models had been trained, they were uploaded to the web server. I
-wrote an automated function on my backend that provides the models with
-datapoints from the OpenWeather forecast data for the next 48 hours, and updates
-this data every ten minutes to adjust the predictions as the forecast changes.
-The outputs from the models are recorded as hourly predictions for each
-datapoint in a JSON file, which is requested by the frontend software and used
-to display a line graph of predicted values for the next 48 hours.
+Once the ten models had been trained, they were uploaded to the web server. An
+automated function in the webapp provides the models with datapoints from the
+OpenWeather forecast data for the next 48 hours, and updates this data every ten
+minutes to adjust the predictions as the forecast changes. The outputs from the
+models are recorded as hourly predictions for each datapoint in a JSON file,
+which is requested by the frontend software and used to display a line graph of
+predicted values for the next 48 hours.
 
 \section{Results}\label{RES}
 
+The system was evaluated in two key areas. First, we evaluated the performance
+of the machine learning forecasting. Then we evaluated the custom hardware by
+qualitatively analysing its benefits compared with commercial alternatives.
+
 \subsection{Machine learning performance}
+
+The accuracy of the machine learning prediction was evaluated over a period of
+48 hours from 12am on 2025/08/30 to 12am on 2025/09/01. This was the period
+following the training of the model so was not included in the training data.
+
+The performance of the model was compared to two alternatives:
+\begin{enumerate}
+    \item \textbf{Raw general forecast from OpenWeather:} This was the input to
+    the machine learning model and would give an indication of whether the
+    accuracy could be improved.
+    \item \textbf{Alternative mean average adjustment:} This simple alternative
+    model applied a constant mean average adjustment to the above raw forecast.
+    This would help identify if a simpler model than the LightGBM process could
+    be used instead.
+\end{enumerate}
+
+\begin{figure}[htbp]
+\centerline{\includegraphics[width=0.5\textwidth]{figures/results.png}}
+\caption{Heatmap results showing MAE and RMSE averaged over both nodes}
+\label{results}
+\end{figure}
+
+Figure \ref{results} shows the machine learning model performance had mixed
+results. 
+
+\subsubsection{Wind and gust speed}
+
+One relative success of the model was in the prediction of wind speed. The
+general forecast and alternative model were completely unusable in this regard
+with MAE of around 200 to 400\%. This overestimate is likely due to the
+macro-scale forecast using wind speed data from much higher positions (often
+10m) where wind speeds are much higher. Even the adjusted model does not correct
+this enough to come close to the true figure with an MAE of 232\%. The machine
+learning model 
 
 \subsection{Range and cost}
 
 \section{Conclusion}\label{CONC}
+
+%TC:ignore
 
 \subsection{Example figure and table}\label{FAT}
 
@@ -285,7 +423,7 @@ copy& More table copy$^{\mathrm{a}}$& &  \\
 \end{center}
 \end{table}
 
-
 \bibliography{references}
 
+%TC:endignore
 \end{document}
