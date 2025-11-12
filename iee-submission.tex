@@ -49,13 +49,13 @@ presents the prototype design and evaluation for Agriscanner: An end-to-end,
 low-cost IoT weather station network that incorporates machine learning
 (LightGBM) to predict future weather within a field. Data is streamed to a web
 application for live visualisation. Evaluation shows the hardware system
-achieves a 1,200m range between nodes for a total range of 2,400m in non-ideal
-conditions. This was achieved at a cost of £520 for the complete system which
-includes two sensor nodes, a repeater and a WiFi gateway while outperforming
-commercial alternatives in range and cost. The machine learning model showed
-mixed results, outperforming general forecasts for certain climate factors
-(wind-speed) but highlighting the need for a larger, more diverse training
-dataset.
+achieves a 1,200m range between nodes for an effective range of 2,400m in
+non-ideal conditions. This was achieved at a cost of £520 for the complete
+system (including two sensor nodes, a repeater, and a WiFi gateway) while
+outperforming commercial alternatives in range and cost. The machine learning
+model showed mixed results, outperforming general forecasts for certain climate
+factors (wind-speed) but highlighting the need for a larger, more diverse
+training dataset.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -76,11 +76,21 @@ by as much as 24\% \cite{drepper2022springfrost}, highlighting the need for an
 accurate prediction allowing farmers to take appropriate counter measures (in
 the case of frosts this could be installing high power fans over the field).
 
-However, general weather forecasts, as provided by the MetOffice in the UK, are
-based on macro-scale models which are not designed to capture local climate
-variations, known as microclimates. Farmers rank the accuracy and reliability of
-weather forecasts as one of the largest limiting factors when making decisions
-in growing season \cite{hu2006understanding}.
+However, weather forecasts, as provided by the MetOffice in the UK, are based on
+macro-scale models which can only give a more general view of weather in a
+region and not smaller distinct climate variations that exist within this, known
+as microclimates. The models used by weather forecasts are not suitable for
+microclimate prediction as they are designed for wide area predictions based on
+planetary movements of wind and moisture.
+
+Farmers rank the accuracy and reliability of weather forecasts as one of the
+largest limiting factors when making decisions in growing season
+\cite{hu2006understanding}. Microclimates can occupy an area of anywhere from
+less than a metre across to several hundred metres \cite{wmo2024}, thus multiple
+different microclimates can exist within a single field. This need for
+hyper-local data was confirmed in preliminary interviews; one farmer noted that
+a single orchard, being situated on a large slope, experienced significantly
+different wind speeds on one side compared to the other.
 
 To address this issue, this paper presents a complete end-to-end system called
 Agriscanner. While commercial IoT weather stations exist, simply viewing current
@@ -89,14 +99,14 @@ contribution of this work is a deployable system that applies an open-source
 machine learning procedure using locally collected sensor data to forecast the
 microclimate.
 
-This approach is distinct from related work in three key areas. First, unlike
-studies relying on public datasets or existing sensor networks, we designed and
-built the entire low-cost hardware network required to collect data from remote
-fields. Second, while other systems focus on complex deep learning models, we
-demonstrate the application of an efficient, tree-based machine learning model
-(LightGBM) as a more accessible alternative. Third, this model is applied in a
-challenging open air environment, as opposed to more controlled contexts such as
-greenhouses.
+This approach is distinct from related local forecasting work in three key
+areas. First, unlike studies relying on public datasets or existing sensor
+networks, we designed and built the entire low-cost hardware network required to
+collect data from remote fields. Second, while other systems focus on complex
+deep learning models, we demonstrate the application of an efficient, tree-based
+machine learning model (LightGBM) as a more accessible alternative. Third, this
+model is applied in a challenging open air environment, as opposed to more
+controlled contexts such as greenhouses.
 
 \subsection{LoRa}
 
@@ -116,11 +126,11 @@ allows the receiver to distinguish signals that are below the noise floor - that
 is, even when background noise is "louder" than the LoRa signal, the data can
 still be processed.
 
-This efficiency gives LoRa a far greater effective range despite their low power
+This efficiency gives LoRa a far greater effective range despite the low power
 output. Relatedly, it also reduces the power budget for both the transmitter
 (sending weaker signals) and the receiver (easier demodulation), which is ideal
-for battery-powered devices. For a technical understanding of the technical
-aspects of LoRa refer to \cite{vangelista2017}.
+for battery-powered devices. For an understanding of the technical aspects of
+LoRa refer to \cite{vangelista2017}.
 
 The main disadvantage of LoRa is a comparatively low data throughput - around 5
 kbps in the configuration used here. However, since the data packets in this
@@ -180,7 +190,7 @@ neural networks. These neural networks were trained to predict the local weather
 variables using data from 25 sensors deployed in the region being studied.  The
 study demonstrated that local predictions were more accurate when using forecast
 data from local weather stations as opposed to global climate datasets, but
-accuracy good in both.
+accuracy was high in both cases.
 
 Blunn et al \cite{blunn2024machine} ran a study focussed on predicting
 temperatures in urban environments during heatwaves, using data from eight
@@ -227,7 +237,7 @@ gateway. The purpose for each is outlined below:
     \item Repeater: Receives LoRa signals from the sensor nodes and then
     immediately re-transmits these to boost range. 
     \item Gateway: A hub that receives LoRa signals and then transmits weather
-    data using WIFI.
+    data using WiFi.
 \end{enumerate}
 
 \begin{figure}[htbp]
@@ -238,10 +248,10 @@ gateway. The purpose for each is outlined below:
 
 All components were commercially available, and assembling the final hardware
 required only basic tools. Each device used an RP2040 based microcontroller
-(iLabs Challenger LoRa) microcontroller, which provided the necessary computing
-power and included built-in LoRa capability for wireless communication. The
-gateway node was additionally equipped with a Raspberry Pi to enable WIFI
-connectivity and remote access via VNC Viewer.
+(iLabs Challenger LoRa), which provided the necessary computing power and
+included built-in LoRa capability for wireless communication. The gateway node
+was additionally equipped with a Raspberry Pi to enable WiFi connectivity and
+remote access via the VNC Viewer application.
 
 \subsubsection{Weatherproofing}
 All sensitive electronics were housed in an IP65-rated waterproof junction box.
@@ -252,8 +262,8 @@ to the main box were sealed with silicone to prevent water ingress.
 
 \subsection{Deployment}
 
-The nodes were completed by mid-august and were installed in a private garden
-for a test deployment collecting local readings from two different locations in
+The nodes were completed and installed in August 2025 in a private garden for a
+test deployment collecting local readings from two different locations within
 the garden. This helped facilitate easy repairs and updates to the devices.
 
 The system ran continuously in this location from the 15th of August, 2025,
@@ -294,10 +304,22 @@ performance on tabular climate data as the authors in
 that LightGBM is compatible with the m2cgen library which allows the conversion
 of the final models to individual JavaScript files.
 
+\subsubsection{General forecast source}
 The model was trained using both historical sensor readings collected in the
-field and general forecast data taken from OpenWeather's API. The final models
-were then able to take future general weather forecast data as input and bias
-correct with the aim of improving accuracy.
+field and general forecast data taken from OpenWeather's \emph{One Call API 3.0}
+\cite{openweatherAPI}. 
+
+This weather API was selected as it was free to use and offered a high
+resolution of forecast readings, with new current and future weather data
+produced every 10 minutes.
+
+\subsubsection{Training procedure}
+
+The final models would take future general weather forecast data as input and
+correct for any bias compared to the sensor data. The output was then a machine
+learning corrected forecast that was predicted to give a more accurate forecast
+of the conditions in the microclimate. This was predicted to improve forecasting
+accuracy.
 
 \begin{figure}[htbp]
 \centerline{\includegraphics[width=0.5\textwidth]{figures/machine-learning-diagram2.jpg}}
@@ -347,19 +369,27 @@ visually in Figure \ref{machine-learning}
           model is over 40,000 lines long in JavaScript format for example).
 \end{enumerate}
 
-Once the ten models had been trained, they were uploaded to the web server. An
-automated function in the webapp provides the models with datapoints from the
-OpenWeather forecast data for the next 48 hours, and updates this data every ten
-minutes to adjust the predictions as the forecast changes. The outputs from the
-models are recorded as hourly predictions for each datapoint in a JSON file,
-which is requested by the frontend software and used to display a line graph of
-predicted values for the next 48 hours.
+Once the ten models had been trained, they were uploaded in JavaScript format to
+the web server. An automated function in the webapp provides the models with
+data from general forecast hourly up to 48 hours in advance. This general
+forecast data was then fed through each of the models to provide a 48 hour
+prediction of each sensor variable (temperature, humidity etc.). These
+predictions could then be requested by the front end in JSON format to display a
+line graph of predicted values for the next 48 hours (see dotted line in Figure
+\ref{temperature}).
 
 \section{Results}\label{RES}
 
 The system was evaluated in two key areas. First, we evaluated the performance
 of the machine learning forecasting. Then we evaluated the custom hardware by
-qualitatively analysing its benefits compared with commercial alternatives.
+quantitatively comparing it with commercial alternatives.
+
+The results for machine learning are limited by a small training data set, with
+only two weeks of sensor data captured before training. This limitation was
+compounded by the fact that the chosen period had virtually no precipitation.
+This factor limited the accuracy of the ML model during the evaluation period,
+as there was significant rainfall at that time. Therefore, predictions of
+humidity and soil moisture were generally less accurate than expected.
 
 \subsection{Machine learning performance}
 
@@ -380,7 +410,7 @@ The performance of the model was compared to two alternatives:
 
 \begin{figure}[htbp]
 \centerline{\includegraphics[width=0.5\textwidth]{figures/results.png}}
-\caption{Heatmap results showing MAE and RMSE averaged over both nodes}
+\caption{Heatmap results showing relative MAE and RMSE averaged over both nodes}
 \label{results}
 \end{figure}
 
@@ -395,33 +425,103 @@ with MAE of around 200 to 400\%. This overestimate is likely due to the
 macro-scale forecast using wind speed data from much higher positions (often
 10m) where wind speeds are much higher. Even the adjusted model does not correct
 this enough to come close to the true figure with an MAE of 232\%. The machine
-learning model 
+learning model achieved a dramatically more accurate prediction with an MAE of
+44\%. While still a notable error, this represents a large improvement over the
+general forecast, which helps to validate this localised forecasting approach.
 
-\subsection{Range and cost}
+\subsubsection{Temperature and humidity}
+
+For temperature and humidity, the ML model did not perform as well. The
+performance differences for temperature were minor overall, with all models
+achieving a low MAE. The alternative prediction achieved the lowest error (1.3\%
+MAE), followed by the ML prediction (2.9\% MAE) and general forecast at (3.4\%).
+This suggests that temperature did not differ significantly in the deployed
+microclimate compared to the macro-climate, and a simple static bias correction
+is quite effective for this prediction.
+
+The humidity forecast however showed a distinctly worse result for machine
+learning (14.9\% MAE) compared to both the general forecast (5.5\% MAE) and the
+alternative prediction (11.1\%). However in RMSE the three predictions are more
+tightly grouped; RMSE is more sensitive to large outliers suggesting the general
+forecast had more occasional but large errors.
+
+The poorer humidity performance is an indicator that the model overfit to the
+small training sample. With no precipitation in training the model could not
+accurately predict how rain would affect the local humidity.
+
+
+\subsubsection{Soil moisture}
+
+A key benefit of the ML model approach is that soil moisture can be predicted,
+which is not usually reported in general weather forecasts. Therefore the
+machine learning model is the only model with any prediction for this variable.
+
+The high error for soil moisture (162\% MAE) is a predictable consequence of the
+lack of precipitation in the training data. When it rained before and during the
+evaluation period the model had not learned the relationship between general
+forecasted rain and an increase in soil moisture. This meant the model
+incorrectly predicted dry soil for the entire evaluation period. 
+
+\subsection{Hardware evaluation}
+
+The other key focus of this work was to create a prototype hardware network that
+was both low-cost and robust enough for the farm environment.
+
+\subsubsection{Range}
+
+The LoRa modules were tested in an urban park in Bristol. While relatively flat,
+the park topography still resulted in broken line of sight between the LoRa
+modules at roughly the 1,000m mark so communication was not expected beyond this
+point. 
+
+\begin{figure}[htbp]
+\centerline{\includegraphics[width=0.5\textwidth]{figures/range-test-markers.jpg}}
+\caption{Annotated satellite image of range test location with 200m markers}
+\label{map}
+\end{figure}
+
+\begin{figure}[htbp]
+\centerline{\includegraphics[width=0.5\textwidth]{figures/range-test-elevation-profile.jpg}}
+\caption{Elevation of test area showing highest point at 1,000m}
+\label{elevation}
+\end{figure}
+
+Despite the lack of line-of-sight, a final range of 1,200m was achieved. With
+the inclusion of the repeater, this gives the system a minimum effective range
+of 2,400m. In a real agricultural deployment, the repeater could be placed on a
+hill, overcoming line-of-sight issues and enabling a range likely multiples
+greater.
+
+\subsubsection{Cost}
+
+The final cost of the hardware was £520. This makes the system more cost
+effective than commercial alternatives. Professional grade weather stations are
+over 10 times this price which makes them inaccessible for many smaller farms.
+
+Our system is £200 cheaper than the nearest competitor (SenseCAP S2120) which
+also uses LoRa for transmission. Also due to the transmitter the range is twice
+as far.
 
 \section{Conclusion}\label{CONC}
 
+This paper presented a methodology for forecasting local microclimates in their
+farms integrated into an end-to-end IoT weather station system. This was
+designed to provide farmers with the a super-local forecast that macro-scale
+"general" forecasts are unable to capture. 
+
+Our evaluation confirmed that our hardware is a viable cost-effective solution
+offering superior range to commercial alternatives. More significantly we
+trained a LightGBM model to predict the error between general forecasts and
+local sensor data to create a localised forecast. This was most effective in the
+prediction of wind speed where the model reduced the relative MAE from 333\% to
+43\%. Performance in humidity and temperature was not clearly better than the
+general forecast but this is almost certainly down to a lack of training data in
+the models - particularly the lack of precipitation.
+
+Future work will focus on generating a larger multi-season dataset with the aim
+of building a more accurate model. 
+
 %TC:ignore
-
-\subsection{Example figure and table}\label{FAT}
-
-\begin{table}[htbp]
-\caption{Table Type Styles}
-\begin{center}
-\begin{tabular}{|c|c|c|c|}
-\hline
-\textbf{Table}&\multicolumn{3}{|c|}{\textbf{Table Column Head}} \\
-\cline{2-4} 
-\textbf{Head} & \textbf{\textit{Table column subhead}}&
-\textbf{\textit{Subhead}}& \textbf{\textit{Subhead}} \\
-\hline
-copy& More table copy$^{\mathrm{a}}$& &  \\
-\hline
-\multicolumn{4}{l}{$^{\mathrm{a}}$Sample of a Table footnote.}
-\end{tabular}
-\label{tab1}
-\end{center}
-\end{table}
 
 \bibliography{references}
 
