@@ -108,43 +108,23 @@ machine learning model (LightGBM) as a more accessible alternative. Third, this
 model is applied in a challenging open air environment, as opposed to more
 controlled contexts such as greenhouses.
 
-\subsection{LoRa}
-
-To ensure the hardware system was appropriate for the off-grid context of most
-agricultural applications, the communication technology chosen for the devices
-was highly important.
-
-LoRa (Long Range) is a radio modulation technique invented in 2014 that allows
-for the transmission of data over very long distances. The technology is notable
-for achieving this long-range transmission (over 4000 times greater than WiFi
-\cite{spiess2019}) while using remarkably little power. This makes it the
-preferred technology for the remote, off-grid application in this project.
-
-The most important principle that separates LoRa from traditional radio
-modulation is its ability to demodulate incoming signals more efficiently. This
-allows the receiver to distinguish signals that are below the noise floor - that
-is, even when background noise is "louder" than the LoRa signal, the data can
-still be processed.
-
-This efficiency gives LoRa a far greater effective range despite the low power
-output. Relatedly, it also reduces the power budget for both the transmitter
-(sending weaker signals) and the receiver (easier demodulation), which is ideal
-for battery-powered devices. For an understanding of the technical aspects of
-LoRa refer to \cite{vangelista2017}.
-
-The main disadvantage of LoRa is a comparatively low data throughput - around 5
-kbps in the configuration used here. However, since the data packets in this
-project were very small this was not a major issue.
 
 \section{Related Work}\label{REL}
 
-\subsection{LoRa based IoT in agriculture}
+\subsection{IoT in agriculture}
 
 IoT devices have seen widespread adoption in agriculture, with digital solutions
-offering the potential to improve yields even in remote areas. LoRa is an
-especially relevant technology in this context as the range of these devices
-enables data to be transmitted over long distances and the low power allows for
-the use of gridless power solutions - such as solar-battery as used here. 
+offering the potential to improve yields even in remote areas. 
+
+\textcolor{red}{Add some related work on non-LoRa IoT, then contrast that to LoRA}
+
+
+LoRa (Long Range) is a radio modulation technique that allows
+for the transmission of data over very long distances (over 4000 times greater than WiFi
+\cite{spiess2019}) while using remarkably little power. This makes it the
+preferred technology for the remote, off-grid applications. LoRa receiver can aslo to distinguish signals even when background noise is ``louder" than the LoRa signal \cite{vangelista2017}.
+The main disadvantage of LoRa is a comparatively low data throughput - around 5
+kbps in the configuration used here. 
 
 There are relatively few papers examining the effectiveness of LoRa in
 agriculture but some notable examples include \cite{edgeAiGiaEtAl} where LoRa
@@ -162,6 +142,8 @@ prototype in India. The authors create a node that measures temperature,
 humidity and soil moisture in an experimental setting with no field deployment.
 Readings are then sent via LoRa to a receiver and can be read manually from the
 device's screen or viewed on an IBM dashboard.  
+
+\textcolor{red}{Conclude by saying that LoRa is particularly relevant in fields, with no wifi...}
 
 \subsection{Weather forecasting microclimates with machine learning}
 
@@ -217,7 +199,11 @@ This design resulted in 98.45\% accuracy for temperature predictions and 99.61\%
 accuracy for humidity predictions. Due to these results LightGBM was also chosen
 for this experiment.
 
+\textcolor{red}{Note cold start challenge, and cost of equipment and wifi needs - and conclude that these challenges are not addressed in related work and are addressed in this paper.}
+
 \section{Methodology}\label{METH}
+
+\textcolor{red}{methodology is Design Science: Analyse, design, deploy, evaluate improve, repeat. I think we had two cycles, the first resulted in battery doubling and box re-design with shading as well. The 3rd is in progress (deploying at Langford).  Add this as the overview part, then the sub-sections are on specific design choices/solutions.}
 
 \subsection{IoT hardware}
 
@@ -241,7 +227,7 @@ gateway. The purpose for each is outlined below:
 \end{enumerate}
 
 \begin{figure}[htbp]
-\centerline{\includegraphics[width=0.5\textwidth]{figures/node.jpg}}
+\centerline{\includegraphics[width=0.45\textwidth]{figures/node.jpg}}
 \caption{Sensor node}
 \label{sensor-node}
 \end{figure}
@@ -321,11 +307,11 @@ learning corrected forecast that was predicted to give a more accurate forecast
 of the conditions in the microclimate. This was predicted to improve forecasting
 accuracy.
 
-\begin{figure}[htbp]
-\centerline{\includegraphics[width=0.5\textwidth]{figures/machine-learning-diagram2.jpg}}
+\begin{figure*}[htbp]
+\centerline{\includegraphics[width=0.8\textwidth]{figures/machine-learning-diagram2.jpg}}
 \caption{Infographic showing training steps for training with LightGBM}
 \label{machine-learning}
-\end{figure}
+\end{figure*}
 
 The following steps were followed to train each of the ten models, also shown
 visually in Figure \ref{machine-learning}
@@ -337,6 +323,7 @@ visually in Figure \ref{machine-learning}
           every 1 minute, this meant that 9/10 node readings were discarded. The
           final dataset was roughly 1,400 rows. The data used for training
           spanned the period 15 - 27 August.
+          \textcolor{red}{Provide dataset as supplementary material.}
     \item \textbf{Feature set and target data defined:} The feature set from the
           weather API and targets from the node data were defined, and
           unnecessary columns discarded. The database timestamp field was
@@ -408,14 +395,14 @@ The performance of the model was compared to two alternatives:
     be used instead.
 \end{enumerate}
 
-\begin{figure}[htbp]
-\centerline{\includegraphics[width=0.5\textwidth]{figures/results.png}}
+\begin{figure*}[htbp]
+\centerline{\includegraphics[width=0.8\textwidth]{figures/results.png}}
 \caption{Heatmap results showing relative MAE and RMSE averaged over both nodes}
 \label{results}
-\end{figure}
+\end{figure*}
 
 Figure \ref{results} shows the machine learning model performance had mixed
-results. 
+results:
 
 \subsubsection{Wind and gust speed}
 
@@ -501,6 +488,9 @@ over 10 times this price which makes them inaccessible for many smaller farms.
 Our system is £200 cheaper than the nearest competitor (SenseCAP S2120) which
 also uses LoRa for transmission. Also due to the transmitter the range is twice
 as far.
+
+\section{Discussion}\label{sec:discussion}
+\textcolor{red}{issues to discuss?: e.g, The 'cold start' challange?  Deployment of many micro-stations? Relevance of the forecast (cost/benefit)? etc. }
 
 \section{Conclusion}\label{CONC}
 
