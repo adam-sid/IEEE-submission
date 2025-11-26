@@ -119,23 +119,24 @@ offering the potential to improve yields even in remote areas.
 \textcolor{red}{Add some related work on non-LoRa IoT, then contrast that to LoRA}
 
 
-LoRa (Long Range) is a radio modulation technique that allows
-for the transmission of data over very long distances (over 4000 times greater than WiFi
+LoRa (Long Range) is a radio modulation technique that allows for the
+transmission of data over very long distances (over 4000 times greater than WiFi
 \cite{spiess2019}) while using remarkably little power. This makes it the
-preferred technology for the remote, off-grid applications. LoRa receiver can aslo to distinguish signals even when background noise is ``louder" than the LoRa signal \cite{vangelista2017}.
-The main disadvantage of LoRa is a comparatively low data throughput - around 5
-kbps in the configuration used here. 
+preferred technology for the remote, off-grid applications. LoRa receiver can
+aslo to distinguish signals even when background noise is ``louder" than the
+LoRa signal \cite{vangelista2017}. The main disadvantage of LoRa is a
+comparatively low data throughput - around 5 kbps in the configuration used
+here. 
 
-There are relatively few papers examining the effectiveness of LoRa in
-agriculture but some notable examples include \cite{edgeAiGiaEtAl} where LoRa
-was used in an edge computing exercise. In this study the authors used CNN
-machine learning to create a compressed image that holds thousands of simulated
-climate readings. This image can then be sent over LoRa to a receiver node which
-can infer the readings of each node from this single image. While only one
-sensor node was created for the exercise they also tested the range of this
-device at a distance of 200m. This system would be useful in particularly large
-networks of LoRa devices where the low data transfer speed of LoRa would start
-to be a limiting factor.
+Papers examining the effectiveness of LoRa in agricultural applications include
+\cite{edgeAiGiaEtAl} where LoRa was used in an edge computing exercise. In this
+study the authors used CNN machine learning to create a compressed image that
+holds thousands of simulated climate readings. This image can then be sent over
+LoRa to a receiver node which can infer the readings of each node from this
+single image. While only one sensor node was created for the exercise they also
+tested the range of this device at a distance of 200m. This system would be
+useful in particularly large networks of LoRa devices where the low data
+transfer speed of LoRa would start to be a limiting factor.
 
 The authors in \cite{smartFarmKodaliEtAl} implement a LoRa based weather station
 prototype in India. The authors create a node that measures temperature,
