@@ -46,16 +46,16 @@ weather stations exist, there is often a trade-off between their cost and
 transmission range. Additionally, these hardware products do not attempt to use
 their data to offer farmers improved forecasting on their fields. This paper
 presents the prototype design and evaluation for Agriscanner: An end-to-end,
-low-cost IoT weather station network that incorporates machine learning
-(LightGBM) to predict future weather within a field. Data is streamed to a web
-application for live visualisation. Evaluation shows the hardware system
-achieves a 1,200m range between nodes for an effective range of 2,400m in
-non-ideal conditions. This was achieved at a cost of £520 for the complete
-system (including two sensor nodes, a repeater, and a WiFi gateway) while
-outperforming commercial alternatives in range and cost. The machine learning
-model showed mixed results, outperforming general forecasts for certain climate
-factors (wind-speed) but highlighting the need for a larger, more diverse
-training dataset.
+low-cost IoT (Internet of Things) weather station network that incorporates
+machine learning (LightGBM) to predict future weather within a field. Data is
+streamed to a web application for live visualisation. Evaluation shows the
+hardware system achieves a 1,200m range between nodes for an effective range of
+2,400m in non-ideal conditions. This was achieved at a cost of £520 for the
+complete system (including two sensor nodes, a repeater, and a WiFi gateway)
+while outperforming commercial alternatives in range and cost. The machine
+learning model showed mixed results, outperforming general forecasts for certain
+climate factors (wind-speed) but highlighting the need for a larger, more
+diverse training dataset.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -111,13 +111,61 @@ controlled contexts such as greenhouses.
 
 \section{Related Work}\label{REL}
 
-\subsection{IoT in agriculture}
-
 IoT devices have seen widespread adoption in agriculture, with digital solutions
-offering the potential to improve yields even in remote areas. 
-
+offering the potential to improve yields even in remote areas.
+\textcolor{blue}{IoT systems require a network communication layer to allow
+either inter-device or device-cloud communication. There are a number of
+alternative communication protocols used in IoT architecture, each with distinct
+trade-offs. The following section reviews literature on common protocols used in
+agriculture (i.e.Bluetooth and Wi-Fi), contrasting them with LoRa which is the
+communication protocol used for this project}
 \textcolor{red}{Add some related work on non-LoRa IoT, then contrast that to LoRA}
 
+\textcolor{blue}{ \subsection{ Non-LoRa IoT in agriculture} One common
+communication standard used in IoT systems is Wi-Fi. In \cite{wifiIoT}, the
+authors developed a smart wireless sensor network using 802.11 Wi-Fi modules
+(WSN802G) to monitor agricultural parameters such as temperature, air pressure
+and soil moisture. Readings from sensors were transmitted to a standard router
+and uploaded to the cloud for storage and retrieval. While the system
+successfully enabled remote monitoring, Wi-Fi has relatively high power
+consumption and while the authors aimed to move to a solar-battery set up as
+part of future work future this had not been attempted.}
+
+\textcolor{blue}{Similarly, studies have investigated Bluetooth for agricultural
+IoT. In \cite{tacskin2018developing}, the authors explored an IoT sensor network
+based on Bluetooth Low Energy (BLE) for greenhouse monitoring. The primary
+advantage of this technology is very high power efficiency with the authors
+estimating a battery life of over 8 years of continuous transmission. Their
+prototype connected ambient light and temperature sensors to a BLE transmitter.
+The transmission is then received by a BLE compatible router and data is
+uploaded to a web API via WiFi. While this solution offers superior energy
+efficiency compared to WiFi, the authors noted that BLE has limited range of
+30-100m. This would make make Bluetooth unsuitable for open-field contexts that
+lack nearby network connectivity.}
+
+\textcolor{blue}{Research has also examined low-rate wireless personal area
+networks (LR-WPAN) for agricultural monitoring. In \cite{xbee}, the authors
+developed a Wireless Sensor Network (WSN) using XBee hardware modules operating
+within the 802.15.4 communication standard to monitor soil moisture and
+temperature. Their system utilized a mesh topology and consisted of sensor
+nodes, routers, and a central coordinator to facilitate communication. While the
+study demonstrated the low power consumption (62 days) and reliability even when
+deployed in open air conditions, the technology's shorter transmission range
+necessitates a complex multi-hop network architecture to cover typical farm
+fields effectively. }
+
+\textcolor{blue}{These non-LoRa technologies present certain advantages over
+LoRa but also come with significant disadvantages in an off-grid context. While
+Wi-Fi provides high bandwidth, its high power consumption restricts off-grid
+viability. Conversely, while BLE and LR-WPAN offer excellent energy efficiency,
+their limited transmission ranges require dense mesh networks using multiple
+nodes to to cover typical agricultural areas and be within reach of an internet
+gateway connection. In contrast, LoRa addresses these specific constraints by
+offering a balance of long-range communication and low power consumption without
+the need for complex intermediate infrastructure.}
+
+
+\textcolor{blue}{\subsection{LoRa IoT in agriculture}}
 
 LoRa (Long Range) is a radio modulation technique that allows for the
 transmission of data over very long distances (over 4000 times greater than WiFi
@@ -146,6 +194,8 @@ device's screen or viewed on an IBM dashboard.
 
 \textcolor{red}{Conclude by saying that LoRa is particularly relevant in fields, with no wifi...}
 
+\textcolor{blue}{I've added some commentary on this to the non-lora section}
+
 \subsection{Weather forecasting microclimates with machine learning}
 
 General weather models operate at magnitudes between 1 and 10 km and
@@ -173,7 +223,8 @@ neural networks. These neural networks were trained to predict the local weather
 variables using data from 25 sensors deployed in the region being studied.  The
 study demonstrated that local predictions were more accurate when using forecast
 data from local weather stations as opposed to global climate datasets, but
-accuracy was high in both cases.
+accuracy was high in both cases. \textcolor{blue}{It was notable that in this
+study only 4 of the 25 sensors used ran without failure.}
 
 Blunn et al \cite{blunn2024machine} ran a study focussed on predicting
 temperatures in urban environments during heatwaves, using data from eight
@@ -202,7 +253,20 @@ for this experiment.
 
 \textcolor{red}{Note cold start challenge, and cost of equipment and wifi needs - and conclude that these challenges are not addressed in related work and are addressed in this paper.}
 
-\section{Methodology}\label{METH}
+\textcolor{blue}{There are still challenges that these studies do not address.
+First, many studies do not provide specific detail on the costs of their sensors
+and in some cases rely on high-cost proprietary hardware as in \cite{kumar2021}.
+While the authors in \cite{abdelmadjid2025enhancing} give a comprehensive
+overview of many ML models in forecast prediction their data come from
+pre-existing public datasets, ignoring the practical challenge of deployment.
+Studies that do deploy actual hardware such as in \cite{zanchi2023harnessing}
+often face reliability issues, in that study the authors had a high failure rate
+in their sensors. This paper addresses these gaps by presenting a complete
+solution from the hardware to software level. This paper addresses these gaps by
+presenting a complete solution from the hardware to the software level. The use
+of LoRa allows this solution to work in the open-air environment over greater
+distances. This makes the use of ML based forecasting more practical for
+producers} \section{Methodology}\label{METH}
 
 \textcolor{red}{methodology is Design Science: Analyse, design, deploy, evaluate improve, repeat. I think we had two cycles, the first resulted in battery doubling and box re-design with shading as well. The 3rd is in progress (deploying at Langford).  Add this as the overview part, then the sub-sections are on specific design choices/solutions.}
 
@@ -325,6 +389,7 @@ visually in Figure \ref{machine-learning}
           final dataset was roughly 1,400 rows. The data used for training
           spanned the period 15 - 27 August.
           \textcolor{red}{Provide dataset as supplementary material.}
+          \textcolor{blue}{Made note to add when submitting}
     \item \textbf{Feature set and target data defined:} The feature set from the
           weather API and targets from the node data were defined, and
           unnecessary columns discarded. The database timestamp field was
