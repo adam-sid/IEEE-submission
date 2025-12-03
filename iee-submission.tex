@@ -50,13 +50,13 @@ presents the prototype design and evaluation for Agriscanner: An end-to-end,
 low-cost IoT (Internet of Things) weather station network that incorporates
 machine learning (LightGBM) to predict future weather within a field. Data is
 streamed to a web application for live visualisation. Evaluation shows the
-hardware system achieves a 1,200m range between nodes for an effective range of
-2,400m in non-ideal conditions. This was achieved at a cost of £520 for the
-complete system (including two sensor nodes, a repeater, and a WiFi gateway)
-while outperforming commercial alternatives in range and cost. The machine
-learning model showed mixed results, outperforming general forecasts for certain
-climate factors (wind-speed) but highlighting the need for a larger, more
-diverse training dataset.
+hardware system achieves a 1,200m range. With the use of a repeater node, this
+allows for an effective range of 2,400m in non-ideal conditions. This was
+achieved at a cost of £520 for the complete system (including two sensor nodes,
+a repeater, and a WiFi gateway) while outperforming commercial alternatives in
+range and cost. The machine learning model showed mixed results, outperforming
+general forecasts for certain climate factors (wind-speed) but highlighting the
+need for a larger, more diverse training dataset.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -73,9 +73,8 @@ and environmental costs attached. For example, it is required by law that
 pesticide spraying must be done in low wind speed to prevent spray drift which
 can damage nearby ecosystems \cite{defra2006code}. Similarly, spring frosts pose
 a significant risk to crop yields; a single frost night can reduce crop yields
-by as much as 24\% \cite{drepper2022springfrost}, highlighting the need for an
-accurate prediction allowing farmers to take appropriate counter measures (in
-the case of frosts this could be installing high power fans over the field).
+by as much as 24\% \cite{drepper2022springfrost}, highlighting the need for
+accurate prediction that allows farmers to take appropriate precautions.
 
 However, weather forecasts, as provided by the MetOffice in the UK, are based on
 macro-scale models which can only give a more general view of weather in a
@@ -118,7 +117,7 @@ offering the potential to improve yields even in remote areas.
 either inter-device or device-cloud communication. There are a number of
 alternative communication protocols used in IoT architecture, each with distinct
 trade-offs. The following section reviews literature on common protocols used in
-agriculture (i.e.Bluetooth and Wi-Fi), contrasting them with LoRa which is the
+agriculture (i.e. Bluetooth and Wi-Fi), contrasting them with LoRa which is the
 communication protocol used for this project}
 \textcolor{red}{Add some related work on non-LoRa IoT, then contrast that to LoRA}
 
@@ -129,8 +128,8 @@ authors developed a smart wireless sensor network using 802.11 Wi-Fi modules
 and soil moisture. Readings from sensors were transmitted to a standard router
 and uploaded to the cloud for storage and retrieval. While the system
 successfully enabled remote monitoring, Wi-Fi has relatively high power
-consumption and while the authors aimed to move to a solar-battery set up as
-part of future work future this had not been attempted.}
+consumption. While the authors aimed to move to a solar-battery set up as part
+of future work future, this was not attempted during the study.}
 
 \textcolor{blue}{Similarly, studies have investigated Bluetooth for agricultural
 IoT. In \cite{tacskin2018developing}, the authors explored an IoT sensor network
@@ -138,11 +137,11 @@ based on Bluetooth Low Energy (BLE) for greenhouse monitoring. The primary
 advantage of this technology is very high power efficiency with the authors
 estimating a battery life of over 8 years of continuous transmission. Their
 prototype connected ambient light and temperature sensors to a BLE transmitter.
-The transmission is then received by a BLE compatible router and data is
-uploaded to a web API via WiFi. While this solution offers superior energy
-efficiency compared to WiFi, the authors noted that BLE has limited range of
-30-100m. This would make make Bluetooth unsuitable for open-field contexts that
-lack nearby network connectivity.}
+The transmission was then received by a BLE compatible router and data uploaded
+to a web API via WiFi. While this solution offers superior energy efficiency
+compared to WiFi, the authors noted that BLE has limited range of 30-100m. This
+would make make Bluetooth unsuitable for open-field contexts that lack nearby
+network connectivity.}
 
 \textcolor{blue}{Research has also examined low-rate wireless personal area
 networks (LR-WPAN) for agricultural monitoring. In \cite{xbee}, the authors
@@ -152,30 +151,29 @@ temperature. Their system utilized a mesh topology and consisted of sensor
 nodes, routers, and a central coordinator to facilitate communication. While the
 study demonstrated the low power consumption (62 days) and reliability even when
 deployed in open air conditions, the technology's shorter transmission range
-necessitates a complex multi-hop network architecture to cover typical farm
-fields effectively. }
+necessitates a dense multi-node network architecture to cover typical farm
+fields effectively, which adds to cost.}
 
 \textcolor{blue}{These non-LoRa technologies present certain advantages over
 LoRa but also come with significant disadvantages in an off-grid context. While
-Wi-Fi provides high bandwidth, its high power consumption restricts off-grid
-viability. Conversely, while BLE and LR-WPAN offer excellent energy efficiency,
-their limited transmission ranges require dense mesh networks using multiple
-nodes to to cover typical agricultural areas and be within reach of an internet
-gateway connection. In contrast, LoRa addresses these specific constraints by
-offering a balance of long-range communication and low power consumption without
-the need for complex intermediate infrastructure.}
+Wi-Fi provides high bandwidth, its high power consumption and short range
+restrict off-grid viability. While BLE and LR-WPAN offer excellent energy
+efficiency, their limited transmission ranges require dense mesh networks using
+multiple nodes to to cover typical agricultural areas and must be within close
+reach of an internet gateway connection. In contrast, LoRa addresses these
+specific constraints by offering a balance of long-range communication and low
+power consumption without the need for complex intermediate infrastructure.}
 
 
 \textcolor{blue}{\subsection{LoRa IoT in agriculture}}
 
 LoRa (Long Range) is a radio modulation technique that allows for the
 transmission of data over very long distances (over 4000 times greater than WiFi
-\cite{spiess2019}) while using remarkably little power. This makes it the
-preferred technology for the remote, off-grid applications. LoRa receiver can
-aslo to distinguish signals even when background noise is ``louder" than the
-LoRa signal \cite{vangelista2017}. The main disadvantage of LoRa is a
-comparatively low data throughput - around 5 kbps in the configuration used
-here. 
+\cite{spiess2019}) while using very little power. This makes it a preferred
+technology for the remote, off-grid applications. LoRa receiver can aslo to
+distinguish signals even when background noise is ''louder" than the LoRa signal
+\cite{vangelista2017}. The main disadvantage of LoRa is a comparatively low data
+throughput - around 5 kbps in the configuration used here. 
 
 Papers examining the effectiveness of LoRa in agricultural applications include
 \cite{edgeAiGiaEtAl} where LoRa was used in an edge computing exercise. In this
@@ -263,21 +261,20 @@ pre-existing public datasets, ignoring the practical challenge of deployment.
 Studies that do deploy actual hardware such as in \cite{zanchi2023harnessing}
 often face reliability issues, in that study the authors had a high failure rate
 in their sensors. This paper addresses these gaps by presenting a complete
-solution from the hardware to software level. This paper addresses these gaps by
-presenting a complete solution from the hardware to the software level. The use
-of LoRa allows this solution to work in the open-air environment over greater
-distances. This makes the use of ML based forecasting more practical for
-producers} \section{Methodology}\label{METH}
+solution from the hardware to the software level. The use of LoRa allows this
+solution to work in the open-air environment over greater distances, making the
+use of ML based forecasting more practical for food producers.}
+\section{Methodology}\label{METH}
 
 \textcolor{red}{methodology is Design Science: Analyse, design, deploy, evaluate improve, repeat. I think we had two cycles, the first resulted in battery doubling and box re-design with shading as well. The 3rd is in progress (deploying at Langford).  Add this as the overview part, then the sub-sections are on specific design choices/solutions.}
 
 \textcolor{blue}{The methodology for this project broadly aligns with the
 concept of an iterative design and engineering cycle proposed by
 \cite{wieringa2014design}. This involved an analysis of requirements; designing
-the software and hardware; deployment of hardware; and finally a qualitative
-evaluation. There were two distinct development cycles; in the first cycle
-issues with battery power and solar heating were identified that were then
-improved upon in the second cycle}
+the software and hardware; deployment of hardware; and then an evaluation of the
+solution. There were two distinct development cycles; in the first cycle issues
+with battery power and solar heating were identified that were then improved
+upon in the second cycle.}
 
 \textcolor{blue}{Presently, a third development cycle is underway. In this
 cycle, the weather stations are being modified to include wind direction
@@ -335,7 +332,7 @@ sunlight, nodes frequently stopped transmitting at approximately 06:00. To
 address this in the second development cycle, a second battery was added in
 parallel, doubling the capacity to 5000 mAh. Subsequent monitoring confirmed
 this was sufficient to maintain power through the night and recharge fully
-during the day.}
+during the day during the August data collection period.}
 
 \subsection{Weatherproofing}
 All sensitive electronics were housed in an IP65-rated waterproof junction box.
@@ -347,10 +344,11 @@ to the main box were sealed with silicone to prevent water ingress.
 \textcolor{blue}{\subsection{Solar heating issue}
 In the first development cycle, the node was constructed with the temperature
 and humidity sensor housed in a small IP55 junction box painted white. However,
-data from the initial deployment revealed a significant discrepancy during sunny
-conditions. The sensor readings showed a delta of approximately $5^{\circ}C$
-compared to local air temperature, indicating that the white paint was not
-sufficient to prevent solar radiation affecting the accuracy of readings.}
+data from the initial deployment revealed a significant temperature discrepancy
+between shaded areas and sun exposed areas. The sensor readings showed a delta
+of approximately $5^{\circ}C$ compared to local forecast air temperature,
+indicating that the white paint was not sufficient to prevent solar radiation
+affecting the accuracy of readings.}
 
 \textcolor{blue}{To address this in the second development cycle, a custom solar
 shield was created using a reshaped aluminium can mounted on a wooden frame.
@@ -701,7 +699,7 @@ tasks on the webapp, such as reading the temperature on a particular date. Then
 participants filled out a Likert scale questionnaire of 10 SUS questions.}
 
 \textcolor{blue}{The application achieved a mean SUS score of 87.7, which
-exceeds the common benchmark of 68 and indicating a high degree of usability.
+exceeds the common benchmark of 68 and indicates a high degree of usability.
 Users also had a successful task completion rate of 92\%, which further supports
 this conclusion. Furthermore, statistical analysis using a Mann-Whitney U test
 revealed no significant difference in satisfaction between mobile and desktop
